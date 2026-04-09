@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assessment Psikologi Rohis SMA</title>
+
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+    ASSESSMENT PSIKOLOGI SISWA/I ROHIS SMA
+───────────────────────────────────────────────────────────────────────
+    FITUR:
+    • Form 20 pertanyaan (Spiritual, Akademik, Sosial, Emosi)
+    • Indikator tersembunyi kerentanan asmara (sangat halus di 5 soal)
+    • Output: HANYA menampilkan ayat Al-Quran / Hadist sesuai kondisi.
+    • Skor otomatis dan Spreadsheet auto-update.
+    • UI/UX Premium (Glassmorphism, Animations).
+═══════════════════════════════════════════════════════════════════════ -->
+
+    <style>
+        /* ── RESET & BASE ─────────────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Color Palette */
+            --primary: #0F172A;
+            --primary-mid: #1E293B;
+            --primary-light: #334155;
+
+            --brand: #3B82F6;
+            --brand-dark: #2563EB;
+            --brand-light: #EFF6FF;
+
+            --gold: #D97706;
+            --gold-light: #FEF3C7;
+
+            --success: #059669;
+            --success-light: #D1FAE5;
+
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+
+            --surface: rgba(255, 255, 255, 0.85);
+            --surface-solid: #FFFFFF;
+
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+
+            /* Fonts */
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-arabic: 'Amiri', serif;
+
+            /* Styling */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            --shadow-float: 0 20px 40px -20px rgba(59, 130, 246, 0.3);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            background: #F8FAFC;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Dynamic Background Elements */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: #DBEAFE;
+            top: -100px;
+            left: -100px;
+        }
+
+        .shape-2 {
+            width: 500px;
+            height: 500px;
+            background: #E0E7FF;
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            width: 300px;
+            height: 300px;
+            background: #FEF3C7;
+            top: 30%;
+            right: 10%;
+            animation-duration: 25s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(50px, 50px) rotate(10deg);
+            }
+        }
+
+        /* ── LAYOUT ──────────────────────────────────────────────────────── */
+        .app {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 1.25rem 5rem;
+        }
+
+        .glass-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        /* ── HEADER ──────────────────────────────────────────────────────── */
+        .header {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--brand), var(--success), var(--gold));
+        }
+
+        .header-icon {
+            font-size: 3.5rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            background: var(--brand-light);
+            width: 90px;
+            height: 90px;
+            line-height: 90px;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 4px #FFF;
+        }
+
+        .header h1 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ── IDENTITY FORM ───────────────────────────────────────────────── */
+        .identity-card {
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .identity-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--primary);
+            background: var(--surface-solid);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px var(--brand-light);
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* ── QUESTIONS ───────────────────────────────────────────────────── */
+        .section {
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .section.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.25rem;
+            padding: 0 0.5rem;
+        }
+
+        .section-title-wrap span {
+            display: block;
+        }
+
+        .sc-icon {
+            font-size: 1.5rem;
+        }
+
+        .sc-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .q-card {
+            background: var(--surface-solid);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: var(--transition);
+        }
+
+        .q-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .q-card.answered {
+            border-left: 4px solid var(--brand);
+        }
+
+        .q-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+            color: var(--primary-mid);
+        }
+
+        .scale-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .scale-opt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 4px;
+            border: 2px solid #F1F5F9;
+            border-radius: var(--radius-md);
+            background: #F8FAFC;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .scale-opt:hover {
+            border-color: #CBD5E1;
+            background: #F1F5F9;
+        }
+
+        .scale-opt.selected {
+            border-color: var(--brand);
+            background: var(--brand);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .scale-opt.selected .scale-num,
+        .scale-opt.selected .scale-lbl {
+            color: white;
+        }
+
+        .scale-num {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: var(--primary-light);
+            line-height: 1;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .scale-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* ── PROGRESS & SUBMIT ───────────────────────────────────────────── */
+        .sticky-progress {
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border-radius: 99px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .prog-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--brand);
+            white-space: nowrap;
+        }
+
+        .prog-bar-bg {
+            flex-grow: 1;
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .prog-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6, #10B981);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 99px;
+        }
+
+        .submit-wrap {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-float);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.5);
+        }
+
+        .submit-btn:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #94A3B8;
+        }
+
+        .disclaimer {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── RESULT SCREEN ───────────────────────────────────────────────── */
+        #result-screen {
+            display: none;
+        }
+
+        #result-screen.visible {
+            display: block;
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .result-greeting {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .quran-box {
+            background: linear-gradient(to bottom, #FFFFFF, #F8FAFC);
+            border: 2px solid #E2E8F0;
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .q-ornament {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand-light);
+            color: var(--brand);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            border: 4px solid #F8FAFC;
+        }
+
+        .arabic-text {
+            font-family: var(--font-arabic);
+            font-size: 2.4rem;
+            color: var(--primary-mid);
+            line-height: 2.2;
+            direction: rtl;
+            margin-bottom: 1.5rem;
+        }
+
+        .terjemahan-text {
+            font-size: 1rem;
+            color: var(--primary-light);
+            font-style: italic;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .sumber-badge {
+            display: inline-block;
+            background: var(--brand-light);
+            color: var(--brand-dark);
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .nasihat-box {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px dashed #CBD5E1;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .nasihat-box h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+
+        .nasihat-box p {
+            font-size: 1.05rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .reset-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            border: 2px solid #E2E8F0;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .reset-btn:hover {
+            border-color: var(--primary-main);
+            color: var(--primary);
+            background: white;
+        }
+
+        /* ── ADMIN FRONTEND ──────────────────────────────────────────────── */
+        #admin-screen {
+            display: none;
+        }
+
+        #admin-screen.visible {
+            display: block;
+        }
+
+        .admin-panel {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            padding: 2rem;
+        }
+
+        .admin-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #F1F5F9;
+            padding-bottom: 1rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #F8FAFC;
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            border: 1px solid #E2E8F0;
+        }
+
+        .stat-card .val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: #F1F5F9;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F1F5F9;
+            color: var(--primary-mid);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 99px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .arabic-text {
+                font-size: 1.8rem;
+            }
+
+            .scale-lbl {
+                display: none;
+            }
+
+            .scale-num {
+                margin: 0;
+            }
+
+            .scale-opt {
+                padding: 16px 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Decorations -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <div class="app">
+
+        <!-- ─── FORM SCREEN ──────────────────────────────────────────────── -->
+        <div id="form-screen">
+
+            <div class="header glass-card">
+                <div class="header-icon">🕌</div>
+                <h1>Assessment Diri Rohis</h1>
+                <p class="subtitle">Evaluasi spiritual dan emosional untuk pembinaan yang lebih baik.<br>Kerahasiaan
+                    jawabanmu terjamin.</p>
+            </div>
+
+            <div class="sticky-progress glass-card">
+                <div class="prog-text"><span id="p-count">0</span> / 20 Terjawab</div>
+                <div class="prog-bar-bg">
+                    <div class="prog-bar-fill" id="p-fill"></div>
+                </div>
+            </div>
+
+            <div class="identity-card glass-card">
+                <h2>📋 Identitas Diri</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nama Panggilan *</label>
+                        <input type="text" id="nama" placeholder="Isi namamu..." autocomplete="off" />
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas *</label>
+                        <input type="text" id="kelas" placeholder="Misal: XI IPA 2..." autocomplete="off" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="questions-area"></div>
+
+            <div class="submit-wrap">
+                <button class="submit-btn" id="submit-btn" disabled onclick="submitForm()">
+                    Selesai & Lihat Hasil
+                </button>
+                <p class="disclaimer">Dengan menekan tombol selesai, kamu setuju data ini dikelola seperlunya oleh
+                    pembina.</p>
+            </div>
+
+        </div>
+
+        <!-- ─── RESULT SCREEN ────────────────────────────────────────────── -->
+        <div id="result-screen">
+            <div class="result-header">
+                <div class="result-greeting">Assalamu'alaikum, <span id="r-name" style="color: var(--brand);"></span>
+                </div>
+                <div class="result-subtitle">Berdasarkan jawabanmu, ini adalah bingkisan pesan untukmu hari ini:</div>
+            </div>
+
+            <div class="quran-box">
+                <div class="q-ornament">📖</div>
+                <div class="arabic-text" id="r-arabic"></div>
+                <div class="terjemahan-text" id="r-terjemahan"></div>
+                <div class="sumber-badge" id="r-sumber"></div>
+            </div>
+
+            <div class="nasihat-box">
+                <h3>💌 Renungan Pembinaan</h3>
+                <p id="r-nasihat"></p>
+            </div>
+
+            <button class="reset-btn" onclick="resetForm()">Kembali ke Awal (Reset)</button>
+        </div>
+
+        <!-- ─── ADMIN DASHBOARD ──────────────────────────────────────────── -->
+        <div id="admin-screen">
+            <div class="admin-panel">
+                <div class="admin-head">
+                    <h2 style="font-family:var(--font-heading); color:var(--primary);">📊 Dashboard Admin</h2>
+                    <div>
+                        <button onclick="exportCSV()"
+                            style="padding:8px 16px; background:var(--success); color:white; border:none; border-radius:6px; cursor:pointer;">⬇
+                            Export CSV</button>
+                        <button onclick="backToForm()"
+                            style="padding:8px 16px; background:#F1F5F9; color:var(--primary); border:none; border-radius:6px; cursor:pointer; margin-left:8px;">Tutup</button>
+                    </div>
+                </div>
+                <div class="stat-grid" id="admin-stats"></div>
+                <div class="table-wrap">
+                    <table id="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Nama</th>
+                                <th>Kls</th>
+                                <th>Spr</th>
+                                <th>Akd</th>
+                                <th>Sos</th>
+                                <th>Ems</th>
+                                <th style="color:var(--danger)">⚠ Asmara (Ind. X)</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+    JAVASCRIPT LOGIC
+═══════════════════════════════════════════════════════════════════ -->
+    <script>
+        'use strict';
+
+        const CONFIG = {
+
+            SHEET_URL: 'https://script.google.com/macros/s/AKfycbyBDMnNtkTKjLYfsQEOyGsDIGnoJvqofcUtWjFAj12odK7JVeqKGUaXywjoSoAXeFV6Qw/exec',
+            ADMIN_CODE: 'rohis2024',
+            STORAGE_KEY: 'rohis_data_v2'
+        };
+
+        /* 
+         * PERTANYAAN 
+         * Indikator asmara disembunyikan dalam pertanyaan-pertanyaan yang terkesan mengukur fokus & distraksi.
+         * rev: true -> Semakin Sering (skor tinggi 4) = Kondisi makin buruk / terindikasi.
+         */
+        const QUESTIONS = [
+            // SPIRITUAL
+            { id: 'S1', cat: 'spiritual', rev: false, text: 'Seberapa rutin kamu menjalankan sholat 5 waktu di awal waktu tanpa menunda?' },
+            { id: 'S2', cat: 'spiritual', rev: false, text: 'Seberapa istiqomah kamu membaca tilawah Al-Quran setiap harinya?' },
+            { id: 'S3', cat: 'spiritual', rev: true, hidden: true, text: 'Seberapa sering kamu merasa melamun atau kehilangan fokus di tengah ibadah karena memikirkan ekspektasi atau harapan terhadap seseorang?' },
+            { id: 'S4', cat: 'spiritual', rev: true, hidden: true, text: 'Seberapa sering kamu segera mengecek HP begitu usai sholat atau kegiatan, karena merasa tidak tenang menunggu balasan pesan atau update dari seseorang?' },
+            { id: 'S5', cat: 'spiritual', rev: false, text: 'Secara umum, seberapa tenang hati kamu saat mengingat Allah dalam keseharian?' },
+            { id: 'S6', cat: 'spiritual', rev: false, text: 'Seberapa antusias kamu saat mengikuti kajian atau halaqah mentoring Rohis?' },
+
+            // AKADEMIK
+            { id: 'A1', cat: 'akademik', rev: false, text: 'Seberapa fokus kamu memperhatikan pelajaran saat guru menerangkan di kelas?' },
+            { id: 'A2', cat: 'akademik', rev: false, text: 'Seberapa teratur jadwal belajarmu di rumah untuk mengulang materi?' },
+            { id: 'A3', cat: 'akademik', rev: true, text: 'Seberapa sering kamu menunda mengerjakan PR sampai malam hari menjelang deadline?' },
+            { id: 'A4', cat: 'akademik', rev: false, text: 'Seberapa besar semangatmu mencapai target akademik (nilai bagus / masuk PTN)?' },
+
+            // SOSIAL & KELUARGA
+            { id: 'K1', cat: 'sosial', rev: false, text: 'Seberapa terbuka komunikasimu dengan kedua orang tua saat ada masalah?' },
+            { id: 'K2', cat: 'sosial', rev: false, text: 'Seberapa nyaman kamu menghabiskan waktu berkumpul bersama keluarga di rumah?' },
+            { id: 'K3', cat: 'sosial', rev: true, hidden: true, text: 'Seberapa sering kamu merasa perlu menjaga privasi HP-mu dengan ketat atau menghapus riwayat obrolan/pencarian agar tidak kebetulan dilihat oleh orang tua?' },
+            { id: 'K4', cat: 'sosial', rev: false, text: 'Seberapa aktif kamu berperan dalam kerja kelompok atau kepanitiaan di sekolah?' },
+            { id: 'K5', cat: 'sosial', rev: true, text: 'Seberapa sering kamu merasa sendirian atau tidak dipahami oleh orang-orang di sekitarmu?' },
+
+            // EMOSI & MENTAL
+            { id: 'E1', cat: 'emosi', rev: false, text: 'Seberapa stabil suasana hati kamu secara keseluruhan dalam seminggu terakhir?' },
+            { id: 'E2', cat: 'emosi', rev: false, text: 'Seberapa nyenyak tidur malammu (bangun dengan badan yang segar tanpa rasa lelah berkepanjangan)?' },
+            { id: 'E3', cat: 'emosi', rev: true, hidden: true, text: 'Seberapa sering suasana hatimu (mood) langsung berubah drastis dari baik menjadi buruk, hanya karena ekspektasimu terhadap seorang teman tidak terpenuhi?' },
+            { id: 'E4', cat: 'emosi', rev: true, hidden: true, text: 'Seberapa sering kamu merasa gelisah, overthinking, atau mati-matian menjaga penampilan hanya gara-gara memikirkan pandangan spesifik satu orang terhadapmu?' },
+            { id: 'E5', cat: 'emosi', rev: false, text: 'Seberapa baik caramu menenangkan diri sendiri ketika sedang merasa sangat kecewa atau marah?' }
+        ];
+
+        const AYAT = {
+            A: {
+                arabic: 'لَا يُكَلِّفُ ٱللَّهُ نَفْسًا إِلَّا وُسْعَهَا',
+                terjemahan: 'Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.',
+                sumber: 'QS Al-Baqarah: 286'
+            },
+            B: {
+                arabic: 'أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ',
+                terjemahan: 'Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.',
+                sumber: 'QS Ar-Ra\'d: 28'
+            },
+            C: {
+                arabic: 'وَلَا تَيْأَسُوا مِن رَّوْحِ ٱللَّهِ',
+                terjemahan: 'Dan jangan kamu berputus asa dari rahmat Allah.',
+                sumber: 'QS Yusuf: 87'
+            },
+            D: {
+                arabic: 'فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا  إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا',
+                terjemahan: 'Karena sesungguhnya sesudah kesulitan itu ada kemudahan. Sesungguhnya sesudah kesulitan itu ada kemudahan.',
+                sumber: 'QS Al-Insyirah: 5–6'
+            },
+            E: {
+                arabic: 'وَعَسَىٰٓ أَن تَكْرَهُوا شَيْـًٔا وَهُوَ خَيْرٌ لَّكُمْ',
+                terjemahan: 'Boleh jadi kamu membenci sesuatu padahal ia amat baik bagimu, dan boleh jadi kamu menyukai sesuatu padahal ia amat buruk bagimu.',
+                sumber: 'QS Al-Baqarah: 216'
+            }
+        };
+
+        const NASIHAT = {
+            A: 'Masyaallah, kamu memiliki pondasi spiritual dan emosional yang sangat stabil saat ini. Teruslah menjadi teladan kebaikan untuk teman-temanmu di sekolah.',
+            B: 'Alhamdulillah, kondisimu cukup baik. Sedikit lagi peningkatan dalam manajemen fokus dan waktu akan membuatmu semakin produktif. Terus istiqomah!',
+            C: 'Tampaknya ada hal yang sedikit membebani pikiranmu belakangan ini. Mari perbanyak dzikir dan jangan ragu berdiskusi dengan mentor/murabbi jika ada yang mengganjal.',
+            D: 'Kamu mungkin sedang melalui fase yang tidak mudah. Tidak apa-apa untuk merasa lelah, istirahatlah yang cukup, dan ceritakan bebanmu kepada orang tua atau guru BK/Pembina Rohis yang kamu percaya.',
+            E: 'Tolong jangan mencoba memikul segalanya sendirian. Kondisimu sedang butuh dukungan. Dekati Allah lewat doa terbaikmu, dan segera temui pembina Rohis/Guru BK untuk ngobrol santai ya. Kami sangat peduli padamu.'
+        };
+
+        const CATEGORIES = [
+            { key: 'spiritual', title: 'Ibadah & Spiritual', icon: '🤲', ids: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'] },
+            { key: 'akademik', title: 'Akademik & Produktivitas', icon: '📚', ids: ['A1', 'A2', 'A3', 'A4'] },
+            { key: 'sosial', title: 'Sosial & Lingkungan', icon: '🤝', ids: ['K1', 'K2', 'K3', 'K4', 'K5'] },
+            { key: 'emosi', title: 'Emosi & Mental', icon: '🧠', ids: ['E1', 'E2', 'E3', 'E4', 'E5'] }
+        ];
+
+        const SCALES = ['Tidak Pernah', 'Jarang', 'Sering', 'Selalu'];
+
+        const answers = {};
+        const totalQ = QUESTIONS.length;
+
+        function buildUI() {
+            const area = document.getElementById('questions-area');
+            let html = '';
+
+            CATEGORIES.forEach((cat) => {
+                html += `
+        <div class="section">
+            <div class="section-title-wrap">
+                <span class="sc-icon">${cat.icon}</span>
+                <span class="sc-title">${cat.title}</span>
+            </div>`;
+
+                cat.ids.forEach(id => {
+                    const q = QUESTIONS.find(x => x.id === id);
+                    html += `
+            <div class="q-card" id="qcard-${id}">
+                <div class="q-text">${q.text}</div>
+                <div class="scale-row">
+                    ${[1, 2, 3, 4].map(v => `
+                    <div class="scale-opt" id="btn-${id}-${v}" onclick="answer('${id}', ${v})">
+                        <span class="scale-num">${v}</span>
+                        <span class="scale-lbl">${SCALES[v - 1]}</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+                });
+                html += `</div>`;
+            });
+
+            area.innerHTML = html;
+
+            // Animate sections on scroll
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('appear');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.section').forEach(sec => obs.observe(sec));
+        }
+
+        function answer(id, val) {
+            answers[id] = val;
+            [1, 2, 3, 4].forEach(v => {
+                const btn = document.getElementById(`btn-${id}-${v}`);
+                if (btn) btn.classList.toggle('selected', v === val);
+            });
+            const card = document.getElementById(`qcard-${id}`);
+            if (card) card.classList.add('answered');
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const done = Object.keys(answers).length;
+            const pct = (done / totalQ) * 100;
+            document.getElementById('p-fill').style.width = pct + '%';
+            document.getElementById('p-count').textContent = done;
+            document.getElementById('submit-btn').disabled = (done < totalQ);
+        }
+
+        function calcCategoryScore(ids) {
+            let sum = 0, count = 0;
+            ids.forEach(id => {
+                const q = QUESTIONS.find(x => x.id === id);
+                if (answers[id] != null) {
+                    // Rev: 1->4, 2->3, 3->2, 4->1. Rumus: 5 - val.
+                    const raw = q.rev ? (5 - answers[id]) : answers[id];
+                    sum += raw;
+                    count++;
+                }
+            });
+            return count > 0 ? Math.round((sum / (count * 4)) * 100) : 0;
+        }
+
+        function calcHiddenIndicator() {
+            // Hidden Indicator (Asmara / Crush / Pacaran)
+            // Berisi soal-soal distraction (rev:true). 
+            // Indikator Positif = skor 3 atau 4 pda jawaban asli.
+            const hiddenIds = QUESTIONS.filter(q => q.hidden).map(q => q.id);
+            let sum = 0, count = 0;
+            hiddenIds.forEach(id => {
+                if (answers[id] != null) {
+                    // Kita ingin skor indikator tinggi jika dia Sering/Selalu (3 atau 4)
+                    // Jawaban divalue 1-4.
+                    sum += answers[id];
+                    count++;
+                }
+            });
+            // Max per soal = 4. 
+            return count > 0 ? Math.round((sum / (count * 4)) * 100) : 0;
+        }
+
+        function getLevel(total) {
+            if (total >= 80) return 'A';
+            if (total >= 65) return 'B';
+            if (total >= 50) return 'C';
+            if (total >= 35) return 'D';
+            return 'E';
+        }
+
+        function submitForm() {
+            const nama = document.getElementById('nama').value.trim();
+            const kelas = document.getElementById('kelas').value;
+
+            if (!nama) {
+                document.getElementById('nama').classList.add('error');
+                showToast('Tolong isi nama kamu dulu ya');
+                document.getElementById('nama').scrollIntoView();
+                return;
+            }
+            if (!kelas) {
+                document.getElementById('kelas').classList.add('error');
+                showToast('Tolong pilih kelas kamu');
+                return;
+            }
+
+            const sS = calcCategoryScore(CATEGORIES[0].ids);
+            const sA = calcCategoryScore(CATEGORIES[1].ids);
+            const sK = calcCategoryScore(CATEGORIES[2].ids);
+            const sE = calcCategoryScore(CATEGORIES[3].ids);
+
+            // Indikator X (Makin tinggi makin terindikasi bucin/asmara)
+            const sX = calcHiddenIndicator();
+
+            const total = Math.round((sS + sA + sK + sE) / 4);
+            const level = getLevel(total);
+
+            // Save Data
+            const record = {
+                timestamp: new Date().toLocaleString('id-ID'),
+                nama, kelas,
+                ...answers,
+                skorSpiritual: sS,
+                skorAkademik: sA,
+                skorSosial: sK,
+                skorEmosi: sE,
+                indikatorX: sX, // Admin Only
+                skorTotal: total,
+                level,
+                kondisi: sX >= 75 ? 'Rentan Asmara' : 'Aman'
+            };
+
+            saveToLocalStorage(record);
+            if (CONFIG.SHEET_URL) sendToSheet(record);
+
+            // Render Result
+            renderResult(nama, level);
+        }
+
+        function renderResult(nama, level) {
+            document.getElementById('form-screen').style.display = 'none';
+
+            const ayat = AYAT[level];
+            document.getElementById('r-name').textContent = nama.split(' ')[0];
+            document.getElementById('r-arabic').textContent = ayat.arabic;
+            document.getElementById('r-terjemahan').textContent = `"${ayat.terjemahan}"`;
+            document.getElementById('r-sumber').textContent = ayat.sumber;
+            document.getElementById('r-nasihat').textContent = NASIHAT[level];
+
+            document.getElementById('result-screen').classList.add('visible');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── STORAGE ────────────────────────────────────────────────────────
+        function saveToLocalStorage(record) {
+            try {
+                const exist = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY) || '[]');
+                exist.push(record);
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(exist));
+            } catch (e) { console.error(e); }
+        }
+
+        function getFromLocalStorage() {
+            try { return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY) || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function sendToSheet(r) {
+            fetch(CONFIG.SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(r)
+            }).catch(e => console.error(e));
+        }
+
+        function resetForm() {
+            Object.keys(answers).forEach(k => delete answers[k]);
+            document.getElementById('nama').value = '';
+            document.getElementById('kelas').value = '';
+            document.querySelectorAll('.scale-opt').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.q-card').forEach(el => el.classList.remove('answered'));
+            updateProgress();
+
+            document.getElementById('result-screen').classList.remove('visible');
+            document.getElementById('form-screen').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Hapus gaya error saat diketik
+        document.getElementById('nama').addEventListener('input', e => e.target.classList.remove('error'));
+        document.getElementById('kelas').addEventListener('change', e => e.target.classList.remove('error'));
+
+        // ── ADMIN ──────────────────────────────────────────────────────────
+        function renderAdmin() {
+            const data = getFromLocalStorage();
+            const tot = data.length;
+            const asmaraCount = data.filter(d => d.indikatorX >= 70).length;
+
+            document.getElementById('admin-stats').innerHTML = `
+        <div class="stat-card"><div class="val">${tot}</div><div class="lbl">Total Masuk</div></div>
+        <div class="stat-card"><div class="val" style="color:var(--danger)">${asmaraCount}</div><div class="lbl">Indikasi Asmara (X>70)</div></div>
+        <div class="stat-card"><div class="val" style="color:var(--success)">${data.filter(d => d.level === 'A' || d.level === 'B').length}</div><div class="lbl">Kondisi Stabil</div></div>
+        <div class="stat-card"><div class="val" style="color:#D97706">${data.filter(d => d.level === 'D' || d.level === 'E').length}</div><div class="lbl">Perlu Pantauan</div></div>
+    `;
+
+            const tbody = document.getElementById('admin-tbody');
+            if (!tot) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center">Belum ada data</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map((d, i) => {
+                const xDanger = d.indikatorX >= 70 ? 'color:var(--danger); font-weight:bold;' : '';
+                return `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${d.timestamp.split(',')[0]}</td>
+            <td style="font-weight:600">${d.nama}</td>
+            <td>${d.kelas}</td>
+            <td>${d.skorSpiritual}</td>
+            <td>${d.skorAkademik}</td>
+            <td>${d.skorSosial}</td>
+            <td>${d.skorEmosi}</td>
+            <td style="${xDanger}">${d.indikatorX}%</td>
+            <td style="font-weight:bold">${d.skorTotal}</td>
+            <td>Level ${d.level}</td>
+        </tr>`;
+            }).join('');
+        }
+
+        function exportCSV() {
+            const data = getFromLocalStorage();
+            if (!data.length) return showToast("Data kosong");
+
+            const headers = ['Timestamp', 'Nama', 'Kelas', 'Spiritual', 'Akademik', 'Sosial', 'Emosi', 'Indikator X', 'Skor Total', 'Level'];
+            const rows = data.map(d => [
+                d.timestamp, d.nama, d.kelas, d.skorSpiritual, d.skorAkademik, d.skorSosial, d.skorEmosi, d.indikatorX, d.skorTotal, d.level
+            ].map(v => `"${v}"`).join(','));
+
+            const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Data_Rohis_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+        }
+
+        function backToForm() {
+            document.getElementById('admin-screen').classList.remove('visible');
+            document.getElementById('form-screen').style.display = 'block';
+        }
+
+        // Cek URL Param
+        if (new URLSearchParams(window.location.search).get('admin') === CONFIG.ADMIN_CODE) {
+            document.getElementById('form-screen').style.display = 'none';
+            document.getElementById('admin-screen').classList.add('visible');
+            renderAdmin();
+        }
+
+        // INIT
+        buildUI();
+
+    </script>
+</body>
+
+</html>
